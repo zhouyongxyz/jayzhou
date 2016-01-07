@@ -1,8 +1,10 @@
 package com.example.snow.jayzhou;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,10 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JayActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
+        implements NavigationView.OnNavigationItemSelectedListener,ListView.OnItemClickListener {
+    private final static String TAG = "JayActivity";
+    private ListView listAlbum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +50,14 @@ public class JayActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //list music
+        listAlbum = (ListView)findViewById(R.id.list_album);
+        List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("title","依然范特西");
+        data.add(map);
+        listAlbum.setAdapter(new AlbumAdapter(this,data));
+        listAlbum.setOnItemClickListener(this);
     }
 
     @Override
@@ -97,5 +115,13 @@ public class JayActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG,"item position ="+position);
+        Intent intent = new Intent(this,MusicPlayer.class);
+        intent.putExtra("album",position);
+        startActivity(intent);
     }
 }
