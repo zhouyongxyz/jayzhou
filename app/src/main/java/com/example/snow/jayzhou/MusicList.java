@@ -9,51 +9,49 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 
-import co.mobiwise.library.MusicPlayerView;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhouyong on 1/7/16.
  */
-public class MusicPlayer extends AppCompatActivity implements Button.OnClickListener {
-    private final static String TAG = "MusicPlayer";
+public class MusicList extends AppCompatActivity implements ListView.OnItemClickListener,Button.OnClickListener {
+    private final static String TAG = "MusicList";
+    private ListView listMusic;
+    private Button btnPlay;
+    private Button btnNext;
+    private Button btnStop;
     private MediaPlayer mp;
-    private MusicPlayerView mpv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_music_player);
-        setTitle("开不了口");
+        setContentView(R.layout.content_music_list);
+        setTitle("依然范特西");
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
-        Log.d(TAG,"music = "+intent.getIntExtra("music", 3));
-
+        Log.d(TAG,"album = "+intent.getIntExtra("album", 3));
+        listMusic = (ListView)findViewById(R.id.list_music);
+        btnPlay = (Button)findViewById(R.id.play);
+        btnNext = (Button)findViewById(R.id.next);
+        btnStop = (Button)findViewById(R.id.stop);
+        btnPlay.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
+        btnStop.setOnClickListener(this);
+        List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("title", "开不了口");
+        data.add(map);
+        listMusic.setAdapter(new MusicAdapter(this, data));
+        listMusic.setOnItemClickListener(this);
         mp = new MediaPlayer();
-        mp.reset();
-        try {
-            mp.setDataSource("/sdcard/test.mp3");
-            mp.prepare();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mpv = (MusicPlayerView) findViewById(R.id.music_player_view);
-        //mpv.setCoverURL("https://upload.wikimedia.org/wikipedia/en/b/b3/MichaelsNumberOnes.JPG");
-        mpv.setMax(mp.getDuration()/1000);
-        mpv.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                if (mpv.isRotating()) {
-                    mp.pause();
-                    mpv.stop();
-                } else {
-                    mpv.start();
-                    mp.start();
-                }
-            }
-        });
     }
 
     @Override
@@ -79,12 +77,25 @@ public class MusicPlayer extends AppCompatActivity implements Button.OnClickList
         }
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(this,MusicPlayer.class);
+        intent.putExtra("music",position);
+        startActivity(intent);
+    }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.play) {
             if(mp == null)
                 return;
+            mp.reset();
+            try {
+                mp.setDataSource("/sdcard/test.mp3");
+                mp.prepare();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
             mp.start();
         } else if(v.getId() == R.id.stop) {
             if(mp == null)
