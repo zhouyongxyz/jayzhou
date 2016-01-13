@@ -16,35 +16,33 @@ import co.mobiwise.library.MusicPlayerView;
 /**
  * Created by zhouyong on 1/7/16.
  */
-public class MusicPlayer extends AppCompatActivity implements Button.OnClickListener {
+public class MusicPlayer extends AppCompatActivity implements Button.OnClickListener ,MediaPlayer.OnPreparedListener{
     private final static String TAG = "MusicPlayer";
     private MediaPlayer mp;
     private MusicPlayerView mpv;
+    private String mMusicName;
+    private BosTask bosTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_music_player);
-        setTitle("开不了口");
+        Intent intent = getIntent();
+        Log.d(TAG, "music = " + intent.getStringExtra("music"));
+        mMusicName = intent.getStringExtra("music");
+        setTitle(mMusicName);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        Intent intent = getIntent();
-        Log.d(TAG,"music = "+intent.getIntExtra("music", 3));
 
+        bosTask = new BosTask(this,"摩羯座/",mMusicName,BosTask.OP_GETURL);
+        bosTask.execute();
         mp = new MediaPlayer();
-        mp.reset();
-        try {
-            mp.setDataSource("/sdcard/test.mp3");
-            mp.prepare();
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        mp.setOnPreparedListener(this);
         mpv = (MusicPlayerView) findViewById(R.id.music_player_view);
         //mpv.setCoverURL("https://upload.wikimedia.org/wikipedia/en/b/b3/MichaelsNumberOnes.JPG");
-        mpv.setMax(mp.getDuration()/1000);
         mpv.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 if (mpv.isRotating()) {
                     mp.pause();
                     mpv.stop();
@@ -108,5 +106,27 @@ public class MusicPlayer extends AppCompatActivity implements Button.OnClickList
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.jay, menu);
         return true;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        Log.d(TAG,"mp prepare is done..");
+        if(mp != null) {
+            mp.start();
+            mpv.setMax(mp.getDuration() / 1000);
+            mpv.start();
+        }
+    }
+    //invoke when BosTask get URL done
+    public void initMusicPlayer(String url) {
+        Log.d(TAG, "url = " + url);
+        mp.reset();
+        try {
+            mp.setDataSource(url);
+            mp.prepareAsync();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -54,7 +54,7 @@ public class JayActivity extends AppCompatActivity
         listAlbum = (ListView)findViewById(R.id.list_album);
         List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
         Map<String,Object> map = new HashMap<String, Object>();
-        map.put("title","依然范特西");
+        map.put("title","摩羯座");
         data.add(map);
         listAlbum.setAdapter(new AlbumAdapter(this,data));
         listAlbum.setOnItemClickListener(this);

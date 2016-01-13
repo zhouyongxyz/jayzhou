@@ -13,10 +13,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by zhouyong on 1/7/16.
@@ -28,12 +24,13 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     private Button btnNext;
     private Button btnStop;
     private MediaPlayer mp;
+    private BosTask bosTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_music_list);
-        setTitle("依然范特西");
+        setTitle("摩羯座");
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
@@ -45,11 +42,12 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
         btnPlay.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnStop.setOnClickListener(this);
-        List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("title", "开不了口");
-        data.add(map);
-        listMusic.setAdapter(new MusicAdapter(this, data));
+        initMusicList();
+        //List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
+        //Map<String,Object> map = new HashMap<String, Object>();
+        //map.put("title", "开不了口");
+        //data.add(map);
+        //listMusic.setAdapter(new MusicAdapter(this, data));
         listMusic.setOnItemClickListener(this);
         mp = new MediaPlayer();
     }
@@ -80,7 +78,7 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this,MusicPlayer.class);
-        intent.putExtra("music",position);
+        intent.putExtra("music",bosTask.getItemStr(position));
         startActivity(intent);
     }
 
@@ -119,5 +117,10 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.jay, menu);
         return true;
+    }
+
+    private void initMusicList() {
+        bosTask = new BosTask(this,"摩羯座",listMusic,BosTask.OP_GETSONGS);
+        bosTask.execute();
     }
 }
