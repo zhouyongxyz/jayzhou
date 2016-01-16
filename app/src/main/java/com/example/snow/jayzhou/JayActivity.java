@@ -17,6 +17,11 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.snow.jayzhou.album.AlbumAdapter;
+import com.example.snow.jayzhou.album.AlbumDescActivity;
+import com.example.snow.jayzhou.bosutils.BosTask;
+import com.example.snow.jayzhou.music.MusicList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +31,7 @@ public class JayActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,ListView.OnItemClickListener {
     private final static String TAG = "JayActivity";
     private ListView listAlbum;
+    private BosTask bosTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +43,10 @@ public class JayActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                Intent intent = new Intent(JayActivity.this, AlbumDescActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -56,8 +64,9 @@ public class JayActivity extends AppCompatActivity
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("title","摩羯座");
         data.add(map);
-        listAlbum.setAdapter(new AlbumAdapter(this,data));
+        listAlbum.setAdapter(new AlbumAdapter(this, data));
         listAlbum.setOnItemClickListener(this);
+        initAlbum();
     }
 
     @Override
@@ -121,7 +130,12 @@ public class JayActivity extends AppCompatActivity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d(TAG,"item position ="+position);
         Intent intent = new Intent(this,MusicList.class);
-        intent.putExtra("album",position);
+        intent.putExtra("album",bosTask.getItemStr(position));
         startActivity(intent);
+    }
+
+    private void initAlbum() {
+        bosTask = new BosTask(this,null,listAlbum,BosTask.OP_GETALBUM);
+        bosTask.execute();
     }
 }

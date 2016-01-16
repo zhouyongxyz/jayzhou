@@ -1,4 +1,4 @@
-package com.example.snow.jayzhou;
+package com.example.snow.jayzhou.album;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,18 +8,21 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.snow.jayzhou.music.MusicItemView;
+import com.example.snow.jayzhou.R;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by zhouyong on 1/7/16.
  */
-public class MusicAdapter extends BaseAdapter {
+public class AlbumAdapter extends BaseAdapter {
     private final static String TAG = "CommentsAdapter";
     private Context mContext;
     private List<Map<String,Object>> mDataList;
     private LayoutInflater mLayoutInflater;
-    public MusicAdapter(Context context,List<Map<String,Object>> data) {
+    public AlbumAdapter(Context context,List<Map<String,Object>> data) {
         mContext = context;
         mDataList = data;
         mLayoutInflater = LayoutInflater.from(context);
@@ -50,7 +53,7 @@ public class MusicAdapter extends BaseAdapter {
         } else {
             item = (MusicItemView)convertView.getTag();
         }
-        Log.d(TAG, "getView position = " + position);
+        Log.d(TAG,"getView position = "+position);
         item.title.setText((String)mDataList.get(position).get("title"));
         return convertView;
     }

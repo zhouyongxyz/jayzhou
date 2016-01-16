@@ -1,4 +1,4 @@
-package com.example.snow.jayzhou;
+package com.example.snow.jayzhou.bosutils;
 
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
@@ -9,6 +9,7 @@ import com.baidubce.services.bos.BosClientConfiguration;
  */
 public class BosClientFactory {
     private static BosClient client = null;
+    public final static String BOS_BUCKET = "snow-jayzhou";
 
     public static BosClient getClient() {
         if(client != null) {

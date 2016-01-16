@@ -1,4 +1,4 @@
-package com.example.snow.jayzhou;
+package com.example.snow.jayzhou.music;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -13,6 +13,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.example.snow.jayzhou.R;
+import com.example.snow.jayzhou.bosutils.BosTask;
+
 
 /**
  * Created by zhouyong on 1/7/16.
@@ -24,17 +27,20 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     private Button btnNext;
     private Button btnStop;
     private MediaPlayer mp;
+    private String mAlbumName;
     private BosTask bosTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_music_list);
-        setTitle("摩羯座");
+        Intent intent = getIntent();
+        mAlbumName = intent.getStringExtra("album");
+        Log.d(TAG, "album name = " + mAlbumName);
+        setTitle(mAlbumName);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        Intent intent = getIntent();
-        Log.d(TAG,"album = "+intent.getIntExtra("album", 3));
+
         listMusic = (ListView)findViewById(R.id.list_music);
         btnPlay = (Button)findViewById(R.id.play);
         btnNext = (Button)findViewById(R.id.next);
@@ -78,6 +84,7 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this,MusicPlayer.class);
+        intent.putExtra("album",mAlbumName);
         intent.putExtra("music",bosTask.getItemStr(position));
         startActivity(intent);
     }
@@ -120,7 +127,7 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     }
 
     private void initMusicList() {
-        bosTask = new BosTask(this,"摩羯座",listMusic,BosTask.OP_GETSONGS);
+        bosTask = new BosTask(this,mAlbumName,listMusic,BosTask.OP_GETSONGS);
         bosTask.execute();
     }
 }

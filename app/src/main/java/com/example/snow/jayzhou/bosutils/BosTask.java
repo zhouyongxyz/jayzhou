@@ -1,4 +1,4 @@
-package com.example.snow.jayzhou;
+package com.example.snow.jayzhou.bosutils;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -6,10 +6,19 @@ import android.util.Log;
 import android.widget.ListView;
 
 import com.baidubce.services.bos.BosClient;
+import com.baidubce.services.bos.model.BosObject;
 import com.baidubce.services.bos.model.BosObjectSummary;
 import com.baidubce.services.bos.model.ListObjectsRequest;
 import com.baidubce.services.bos.model.ListObjectsResponse;
+import com.example.snow.jayzhou.music.MusicAdapter;
+import com.example.snow.jayzhou.music.MusicPlayer;
+import com.example.snow.jayzhou.album.AlbumAdapter;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +60,7 @@ public class BosTask extends AsyncTask<Object,Object,Object> {
 
     @Override
     protected void onPostExecute(Object data) {
+        Log.d(TAG, "onPostExecute op = " + mOp);
         if(mOp.equals(OP_GETSONGS)) {
             if (mList != null) {
                 mData = (List<Map<String, Object>>) data;
@@ -60,15 +70,31 @@ public class BosTask extends AsyncTask<Object,Object,Object> {
             mUrl = data.toString();
             ((MusicPlayer)mContext).initMusicPlayer(mUrl);
         }else if(mOp.equals(OP_GETALBUM)) {
-
+            //Log.d(TAG,"album data ="+data.toString());
+            mData = new ArrayList<Map<String, Object>>();
+            try {
+                JSONArray jsonAlbum = new JSONObject(data.toString()).getJSONArray("album");
+                for(int i=0;i< jsonAlbum.length();i++) {
+                    JSONObject obj = jsonAlbum.getJSONObject(i);
+                    Map<String,Object> map = new HashMap<String, Object>();
+                    map.put("title",obj.getString("name"));
+                    mData.add(map);
+                }
+                if (mList != null) {
+                    mList.setAdapter(new AlbumAdapter(mContext, mData));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     protected Object doInBackground(Object... params) {
+        Log.d(TAG,"doInBackground op = "+mOp);
         if(mOp.equals(OP_GETSONGS)) {
             try {
-                ListObjectsRequest request = new ListObjectsRequest("snow-jayzhou");
+                ListObjectsRequest request = new ListObjectsRequest(BosClientFactory.BOS_BUCKET);
                 request.setPrefix(mPrefix + "/");
                 ListObjectsResponse listing = client.listObjects(request);
 
@@ -87,10 +113,23 @@ public class BosTask extends AsyncTask<Object,Object,Object> {
                 e.printStackTrace();
             }
         }else if(mOp.equals(OP_GETURL)) {
-            URL url = client.generatePresignedUrl("snow-jayzhou", mPrefix+"/"+mName, 2000);
+            URL url = client.generatePresignedUrl(BosClientFactory.BOS_BUCKET, mPrefix+"/"+mName, 2000);
             return url.toString();
         }else if(mOp.equals(OP_GETALBUM)) {
-
+            try {
+                BosObject bosObject = client.getObject(BosClientFactory.BOS_BUCKET, "album.txt");
+                InputStream in = bosObject.getObjectContent();
+                ByteArrayOutputStream data = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                while ((len = in.read(buffer)) != -1) {
+                    data.write(buffer, 0, len);
+                }
+                //Log.d(TAG,"data = "+data.toString());
+                return data.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }

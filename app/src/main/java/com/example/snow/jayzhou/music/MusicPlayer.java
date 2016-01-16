@@ -1,4 +1,4 @@
-package com.example.snow.jayzhou;
+package com.example.snow.jayzhou.music;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -11,6 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.snow.jayzhou.R;
+import com.example.snow.jayzhou.bosutils.BosTask;
+
 import co.mobiwise.library.MusicPlayerView;
 
 /**
@@ -20,6 +23,7 @@ public class MusicPlayer extends AppCompatActivity implements Button.OnClickList
     private final static String TAG = "MusicPlayer";
     private MediaPlayer mp;
     private MusicPlayerView mpv;
+    private String mAlbumName;
     private String mMusicName;
     private BosTask bosTask;
 
@@ -29,12 +33,13 @@ public class MusicPlayer extends AppCompatActivity implements Button.OnClickList
         setContentView(R.layout.content_music_player);
         Intent intent = getIntent();
         Log.d(TAG, "music = " + intent.getStringExtra("music"));
+        mAlbumName = intent.getStringExtra("album");
         mMusicName = intent.getStringExtra("music");
         setTitle(mMusicName);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        bosTask = new BosTask(this,"摩羯座/",mMusicName,BosTask.OP_GETURL);
+        bosTask = new BosTask(this,mAlbumName+"/",mMusicName,BosTask.OP_GETURL);
         bosTask.execute();
         mp = new MediaPlayer();
         mp.setOnPreparedListener(this);
