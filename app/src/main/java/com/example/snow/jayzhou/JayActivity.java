@@ -2,8 +2,10 @@ package com.example.snow.jayzhou;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -32,6 +34,8 @@ public class JayActivity extends AppCompatActivity
     private final static String TAG = "JayActivity";
     private ListView listAlbum;
     private BosTask bosTask;
+    private SwipeRefreshLayout mRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +71,8 @@ public class JayActivity extends AppCompatActivity
         listAlbum.setAdapter(new AlbumAdapter(this, data));
         listAlbum.setOnItemClickListener(this);
         initAlbum();
+        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.refresh_album);
+        initFreshLayout();
     }
 
     @Override
@@ -128,14 +134,33 @@ public class JayActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG,"item position ="+position);
-        Intent intent = new Intent(this,MusicList.class);
-        intent.putExtra("album",bosTask.getItemStr(position));
+        Log.d(TAG, "item position =" + position);
+        Intent intent = new Intent(this,AlbumDescActivity.class);
+        intent.putExtra("album",bosTask.getItemTitle(position));
+        intent.putExtra("desc",bosTask.getItemDesc(position));
         startActivity(intent);
     }
 
     private void initAlbum() {
         bosTask = new BosTask(this,null,listAlbum,BosTask.OP_GETALBUM);
         bosTask.execute();
+    }
+
+    private void initFreshLayout() {
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //mRefreshLayout.setRefreshing(true);
+                //do something to refresh ui
+                (new Handler()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initAlbum();
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        }
+        );
     }
 }

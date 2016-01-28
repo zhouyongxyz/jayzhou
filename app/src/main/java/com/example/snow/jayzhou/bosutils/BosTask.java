@@ -78,6 +78,7 @@ public class BosTask extends AsyncTask<Object,Object,Object> {
                     JSONObject obj = jsonAlbum.getJSONObject(i);
                     Map<String,Object> map = new HashMap<String, Object>();
                     map.put("title",obj.getString("name"));
+                    map.put("desc",obj.getString("desc"));
                     mData.add(map);
                 }
                 if (mList != null) {
@@ -134,8 +135,12 @@ public class BosTask extends AsyncTask<Object,Object,Object> {
         return null;
     }
 
-    public String getItemStr(int pos) {
+    public String getItemTitle(int pos) {
         return mData.get(pos).get("title").toString();
+    }
+
+    public String getItemDesc(int pos) {
+        return mData.get(pos).get("desc").toString();
     }
 
     public String getUrl() {

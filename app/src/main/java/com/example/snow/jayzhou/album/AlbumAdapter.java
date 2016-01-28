@@ -47,7 +47,7 @@ public class AlbumAdapter extends BaseAdapter {
         MusicItemView item = null;
         if(convertView == null) {
             item = new MusicItemView();
-            convertView = mLayoutInflater.inflate(R.layout.list_music_item,null);
+            convertView = mLayoutInflater.inflate(R.layout.list_album_item,null);
             item.title = (TextView)convertView.findViewById(R.id.title);
             convertView.setTag(item);
         } else {

@@ -3,6 +3,8 @@ package com.example.snow.jayzhou.music;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     private MediaPlayer mp;
     private String mAlbumName;
     private BosTask bosTask = null;
+    private SwipeRefreshLayout mRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,8 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
         btnNext.setOnClickListener(this);
         btnStop.setOnClickListener(this);
         initMusicList();
+        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.refresh_music_list);
+        initFreshLayout();
         //List<Map<String,Object>> data = new ArrayList<Map<String,Object>>();
         //Map<String,Object> map = new HashMap<String, Object>();
         //map.put("title", "开不了口");
@@ -85,7 +90,7 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this,MusicPlayer.class);
         intent.putExtra("album",mAlbumName);
-        intent.putExtra("music",bosTask.getItemStr(position));
+        intent.putExtra("music",bosTask.getItemTitle(position));
         startActivity(intent);
     }
 
@@ -129,5 +134,23 @@ public class MusicList extends AppCompatActivity implements ListView.OnItemClick
     private void initMusicList() {
         bosTask = new BosTask(this,mAlbumName,listMusic,BosTask.OP_GETSONGS);
         bosTask.execute();
+    }
+
+    private void initFreshLayout() {
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //mRefreshLayout.setRefreshing(true);
+                //do something to refresh ui
+                (new Handler()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initMusicList();
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        }
+        );
     }
 }
